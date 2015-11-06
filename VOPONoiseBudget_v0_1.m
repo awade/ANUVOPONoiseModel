@@ -73,21 +73,76 @@ alpha_KTP = 6.7e-6; % [m/(m.K)] First order expation rate of KTP
 
 %%%%%%%%%%%%%%%%%%%%%%%
 
+% Speificies of input power etc
+Deltaa_ss = 0; % On resonance no fluctations in cavity length
+Deltab_ss = 0;
+Deltaa_delta = 0;
+Deltab_delta = 0;
+
+
+epsilon_ss = epsilon_0;
+epsilon_delta = 0;
+
+a_ss = 0;
+Bin = sqrt(105e-3/(h*c/lambdaHarm)); %[W] Incident pump amplitude put in units of sqrt(photon/s)
+b_ss = sqrt(2.*kb_in)./(kb_total+1i.*Deltab_ss).*Bin;
+
+
+%% Scan frequency as a parameter
+Omega = 2.*pi.*linspace(0,50e6,100);
 
 
 
 
 %% Basic working model
+LambdaMat = [1 1 0 0;1i -1i 0 0;0 0 1 1; 0 0 1i -1i]; %Defining transfer matrix that converts the creation anihilation form of 4x1 Fourier domain matrixes to 4x1 quadtrature terms
+
+
 
 % Intracavity field round trip transfer matrix
-Mc = [-ka_total-1i.*Delta_a_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
-      conj(epsilon_ss).*conj(b_ss),-ka_total+1i.*Delta_a_ss,0,conj(epsilon_ss).*a_ss;...
-      -conj(epsilon_ss).*a_ss,0,-kb_total-1i.*Delta_b_ss,0;...
-      0,-epsilon_ss.*conj(a_ss),0,-kb_total+1i.*Delta_b_ss]; % Steady state transfer components of dual cavity equation matrix
+Mc = [-ka_total-1i.*Deltaa_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
+      conj(epsilon_ss).*conj(b_ss),-ka_total+1i.*Deltaa_ss,0,conj(epsilon_ss).*a_ss;...
+      -conj(epsilon_ss).*a_ss,0,-kb_total-1i.*Deltab_ss,0;...
+      0,-epsilon_ss.*conj(a_ss),0,-kb_total+1i.*Deltab_ss]; % Steady state transfer components of dual cavity equation matrix
   
-% The indivisual mirror coupling rate matrixes
+% The individual mirror coupling rate matrixes
 Min = diag([sqrt(2.*ka_in) sqrt(2.*ka_in) sqrt(2.*kb_in) sqrt(2.*kb_in)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
 Mout = diag([sqrt(2.*ka_out) sqrt(2.*ka_out) sqrt(2.*kb_out) sqrt(2.*kb_out)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
 Ml = diag([sqrt(2.*ka_l) sqrt(2.*ka_l) sqrt(2.*kb_l) sqrt(2.*kb_l)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
 
-  
+
+% Input fields in quadrature form
+
+Xin = [1;1;1;1]; % Template of what to put in [Ain_delta,AinDagger_delta,Bin_delta,BinDagger_delta]; % Input coupler fields
+Xout = [1;1;1;1]; % Template of what to put in [Aout_delta,AoutDagger_delta,Bout_delta,BoutDagger_delta]; % Output coupler fields
+Xl = [1;1;1;1]; % Template of what to put in [Al_delta,AlDagger_delta,Bl_delta,BlDagger_delta]; % Intracavity loss 'port' this we treat as a mirror at one point
+
+XDelta = [-1i.*a_ss.*Deltaa_delta;1i.*a_ss.*Deltaa_delta;-1i.*b_ss.*Deltab_delta;-1i.*b_ss.*Deltab_delta]; %Flucating part of the cavity detuning, due to cavity length noise or other temperature induced detuning etc
+
+Xepsilon = [conj(a_ss).*b_ss.*epsilon_delta;a_ss.*conj(b_ss).*conj(epsilon_delta);-0.5.*a_ss.^2.*conj(epsilon_delta);-0.5.*conj(a_ss).^2.*epsilon_delta]; %Fluctuation component of the coupling coefficient
+
+
+%Compute circulating fields (this is all lumped together
+%LATER THIS WILL BE SEPERATED OUT
+
+for i = 1:length(Omega)
+Xc(:,i) = inv(1i.*Omega(i).*eye(4)-Mc)*(Min*inv(LambdaMat)*Xin+Mout*inv(LambdaMat)*Xout+Ml*inv(LambdaMat)*Xl+eye(4)*XDelta+eye(4)*Xepsilon); %Fourier domain operator solved value of the intracavity circulating fields in terms of the extracavity fields
+end
+
+
+%Compute outcoupled fields (except for loss port as this is not accessable physically.
+Xtrans = Mout*Xc-inv(LambdaMat)*Xout*ones(1,length(Xc));%Applying cavity boundtry conditions to get the transmitted and reflected fields.
+Xrefl = Min*Xc-inv(LambdaMat)*Xin*ones(1,length(Xc));
+
+
+
+QuadtratureFields_trans = LambdaMat*Xtrans;
+QuadtratureFields_refl = LambdaMat*Xrefl;
+
+V_trans = abs(QuadtratureFields_trans).^2;
+V_refl = abs(QuadtratureFields_refl).^2;
+
+figure(1)
+plot(Omega,V_trans(1,:),Omega,V_trans(2,:))
+
+
