@@ -89,14 +89,12 @@ Vin = [1;1;1;1]; % Template of what to put in [Ain_delta,AinDagger_delta,Bin_del
 Vout = [1;1;1;1]; % Template of what to put in [Aout_delta,AoutDagger_delta,Bout_delta,BoutDagger_delta]; % Output coupler fields
 
 
-%% Scan frequency as a parameter
+%% Example scan frequency as a parameter
 Omega = logspace(0,10,1000);
 
 for i = 1:length(Omega)
 [Vrefl1(i),Vrefl2(i)] = VreflTransfer(Omega(i),Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a,Delta_b,Vin,Vout);
 end
-
-
 
 
 figure(1)
