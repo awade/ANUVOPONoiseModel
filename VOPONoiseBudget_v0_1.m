@@ -35,7 +35,7 @@ L = 0.345+0.01*0.83; %[m] total effective cavity round trip length
 %Fundamental field parameters
 Rain = 0.845;%+0.0001; %Input coupler reflectivity
 Raout = 1; %Output (transmission) coupler reflectivity
-Lossa = 1-0;989; 0.0; %Intra-cavity loss
+Lossa = 1-0.989; 0.0; %Intra-cavity loss
 
 % Harmonic field parameters
 Rbin = 0.7;
@@ -89,7 +89,7 @@ b_ss = sqrt(2.*kb_in)./(kb_total+1i.*Deltab_ss).*Bin;
 
 
 %% Scan frequency as a parameter
-Omega = 2.*pi.*linspace(0,50e6,100);
+Omega = logspace(0,10,1000);
 
 
 
@@ -142,7 +142,15 @@ QuadtratureFields_refl = LambdaMat*Xrefl;
 V_trans = abs(QuadtratureFields_trans).^2;
 V_refl = abs(QuadtratureFields_refl).^2;
 
+
+
 figure(1)
-plot(Omega,V_trans(1,:),Omega,V_trans(2,:))
+NP = semilogx(Omega/2/pi,10*log10(V_refl(1,:)),Omega/2/pi,10*log10(V_refl(2,:)),'--');
+NP(1).LineWidth = 2;
+axis([min(Omega/2/pi),max(Omega/2/pi),-20,30])
+legend('V1','V2')
+xlabel('Frequency from Resonance [MHz]')
+ylabel('V_{relf} [dBm rel SN]')
+set(gca,'FontSize',18)
 
 
