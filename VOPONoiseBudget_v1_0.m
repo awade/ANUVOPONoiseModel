@@ -99,7 +99,7 @@ end
 
 figure(1)
 NP = semilogx(Omega/2/pi,10*log10(Vrefl1),Omega/2/pi,10*log10(Vrefl2),'--');
-NP(1).LineWidth = 2;
+%NP(1).LineWidth = 2;
 axis([min(Omega/2/pi),max(Omega/2/pi),-30,30])
 legend('V1','V2')
 xlabel('Frequency from Resonance [MHz]')
