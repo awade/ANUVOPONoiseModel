@@ -53,13 +53,20 @@ switch nargin
         Vout = [1;1;1;1]; % Assume out port fields are vacuum
         Delta_a = [0 0]; % Assume fundamental field is on resonance with no fluctuations
         Delta_b = [0 0]; % Assume harmonic field is on resonance with no fluctuations
+%         diplay('Defult vac at all ports and no detunings') %Trouble shooting display text
     case 11
         Vin = [1;1;1;1]; % Assume input port fields are vacuum
         Vout = [1;1;1;1]; % Assume out port fields are vacuum
         Delta_b = [0 0]; % Assume harmonic field is on resonance with no fluctuations
+%         diplay('Defult vac at all ports fundamental detuning') %Trouble shooting display text
+
     case 12
         Vin = [1;1;1;1]; % Assume input port fields are vacuum
         Vout = [1;1;1;1]; % Assume out port fields are vacuum
+        diplay('Defult vac at all ports')
+    case 14
+%         display('All inputs put in') %Trouble shooting display text
+
 end
 
 
