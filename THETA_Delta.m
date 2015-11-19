@@ -33,34 +33,6 @@ function [THETA_DELTA] = THETA_Delta(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_
 % Mods: 18 Nov 2015
 
 % Check number of inputs and throw error if wrong
-if nargin>14
-    error('VreflTransferErr1:ErrorInputValNumberTooMany','User entered too many input variables, function requires at most 14');
-end
-if nargin<10
-    error('VreflTransferErr2:ErrorInputValNumberTooFew','User entered too few input variables, function requires at least 10');
-end
-if nargin==13
-    error('VreflTransferErr3:ErrorInputValNumberElevenNotRight','User entered Variance of fields at input coupler but not the output coupler, information is incompleate leave out if you want to assume they are all vacuum');
-end
-
-% Handle cases of different number of inputs
-switch nargin
-    case 10
-        Vin = [1;1;1;1]; % Assume input port fields are vacuum
-        Vout = [1;1;1;1]; % Assume out port fields are vacuum
-        Delta_a = [0 0]; % Assume fundamental field is on resonance with no fluctuations
-        Delta_b = [0 0]; % Assume harmonic field is on resonance with no fluctuations
-    case 11
-        Vin = [1;1;1;1]; % Assume input port fields are vacuum
-        Vout = [1;1;1;1]; % Assume out port fields are vacuum
-        Delta_b = [0 0]; % Assume harmonic field is on resonance with no fluctuations
-    case 12
-        Vin = [1;1;1;1]; % Assume input port fields are vacuum
-        Vout = [1;1;1;1]; % Assume out port fields are vacuum
-end
-
-
-Vl = [1;1;1;1]; % Vacuum fields coupled throught the loss 'port'
 
 ka_total = ka_in + ka_out + ka_l; %The total decay rate of the whole cavity
 kb_total = kb_in + kb_out + kb_l; %The total decay rate of the whole cavity
