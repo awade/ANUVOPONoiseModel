@@ -31,6 +31,8 @@ function [THETA_DELTA] = THETA_Delta(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_
 % Author: Andrew Wade
 % Date: 6 Nov 2015
 % Mods: 18 Nov 2015
+%       19 Nov, added MDelta matrix and Lambda-1 to make Delta and epsilon
+%       consistent with other Theta/X matrices/vectors
 
 % Check number of inputs and throw error if wrong
 
@@ -62,6 +64,7 @@ Mc = [-ka_total-1i.*Deltaa_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
 % The individual mirror coupling rate matrixes
 Mout = diag([sqrt(2.*ka_out) sqrt(2.*ka_out) sqrt(2.*kb_out) sqrt(2.*kb_out)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
 Min = diag([sqrt(2.*ka_in) sqrt(2.*ka_in) sqrt(2.*kb_in) sqrt(2.*kb_in)]);   
+MDelta = diag([-1i*a_ss 1i*conj(a_ss) -1i*b_ss 1i*conj(b_ss)]);  %%%% New N matrix to make Chi_delta more consistent
 
-    THETA_DELTA = LambdaMat*Min*inv(1i.*Omega.*eye(4)-Mc)*Chi_Delta;
+    THETA_DELTA = LambdaMat*Min*inv(1i.*Omega.*eye(4)-Mc)*MDelta*inv(LambdaMat); %%% Now multiplying by Lambda^-1 to turn Chi into X
     

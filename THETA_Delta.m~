@@ -1,9 +1,9 @@
-function THETA_epsil = THETA_epsilon(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a,Delta_b,varargin)
+function [THETA_DELTA] = THETA_Delta(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a,Delta_b,varargin)
 %
 % Computes the 
-% THETA_epsil Computes the THETA_epsilon Matrix from Chi_epsilon,
+% THETA_Delta Computes the THETA_DELTA Matrix from Lambda matrix from Chi_DELTA,
 % Mout, Mc and Lambda matrices. This encapsultes the time-varying
-% fluctuations in the nonlinearity.
+% fluctuations in the detuning in each field
 %
 % 
 %
@@ -12,13 +12,14 @@ function THETA_epsil = THETA_epsilon(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_
 % in the input to the function.
 %
 % Output:
-%   [THETA_epsilon] = 1x4 column vector of fluctuations in nonlinearity
+%   [THETA_DELTA] = 1x4 column vector of fluctuations in detuning. Length
+%   noise goes here
 %
 % Input: 
 %   Omega = Fourier sideband frequency 
-%   Chi_epsilon = 4x1 vector laid out in eq 5.17 of Kirk's thesis, 
-%   Chi_epsilon = [conj(a_ss)*b_ss*delta_epsilon; a_ss*conj(b_ss)*conj(delta_epsilon);...
-%   ... -0.5*a_ss^2*conj(delta_epsilon); i*conj(b_ss)*delta_DELTA_b]
+%   Chi_Delta = 4x1 vector laid out in eq 5.17 of Kirk's thesis, 
+%   Chi_Delta = [-i*a_ss*delta_DELTA_a;i*conj(a_ss)_delta_DELTA_a;...
+%   ... -i*b_ss*delta_DELTA_b; i*conj(b_ss)*delta_DELTA_b]
 %
 %   Ain = classical SI units power of seed at input [W]
 %   Bin = classical SI units power of harmonic (pump) at input [W]
@@ -30,9 +31,10 @@ function THETA_epsil = THETA_epsilon(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_
 % Author: Andrew Wade
 % Date: 6 Nov 2015
 % Mods: 18 Nov 2015
-%       19 Nov, added MDelta matrix and Lambda-1 to make Delta and epsilon
+%       19 Nov, added N matrix and Lambda-1 to make Delta and epsilon
 %       consistent with other Theta/X matrices/vectors
 
+% Check number of inputs and throw error if wrong
 
 ka_total = ka_in + ka_out + ka_l; %The total decay rate of the whole cavity
 kb_total = kb_in + kb_out + kb_l; %The total decay rate of the whole cavity
@@ -51,10 +53,7 @@ a_ss = sqrt(2.*ka_in).*(ka_total-1i.*Deltaa_ss+epsilon_ss.*b_ss)./(ka_total.^2+D
 
 LambdaMat = [1 1 0 0;1i -1i 0 0;0 0 1 1; 0 0 1i -1i]; %Defining transfer matrix that converts the creation anihilation form of 4x1 Fourier domain matrixes to 4x1 quadtrature terms
 
-% XDelta = [-1i.*a_ss.*Deltaa_delta;1i.*a_ss.*Deltaa_delta;-1i.*b_ss.*Deltab_delta;-1i.*b_ss.*Deltab_delta]; %Flucating part of the cavity detuning, due to cavity length noise or other temperature induced detuning etc
-% 
- %Chi_epsilon = [conj(a_ss).*b_ss.*epsilon_delta;a_ss.*conj(b_ss).*conj(epsilon_delta);-0.5.*a_ss.^2.*conj(epsilon_delta);-0.5.*conj(a_ss).^2.*epsilon_delta]; %Fluctuation component of the coupling coefficient
-
+ Chi_Delta = [-1i.*a_ss.*Deltaa_delta;1i.*a_ss.*Deltaa_delta;-1i.*b_ss.*Deltab_delta;-1i.*b_ss.*Deltab_delta]; %Flucating part of the cavity detuning, due to cavity length noise or other temperature induced detuning etc
 
 % Intracavity field round trip transfer matrix
 Mc = [-ka_total-1i.*Deltaa_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
@@ -63,8 +62,9 @@ Mc = [-ka_total-1i.*Deltaa_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
       0,-epsilon_ss.*conj(a_ss),0,-kb_total+1i.*Deltab_ss]; % Steady state transfer components of dual cavity equation matrix
   
 % The individual mirror coupling rate matrixes
- Min = diag([sqrt(2.*ka_in) sqrt(2.*ka_in) sqrt(2.*kb_in) sqrt(2.*kb_in)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
- Mepsilon = diag([epsilon_delta conj(epsilon_delta) epsilon_delta conj(epsilon_delta)]);
-    THETA_epsil = LambdaMat*Min*inv(1i.*Omega.*eye(4)-Mc)*Mepsilon*inv(LambdaMat);
-    
+Mout = diag([sqrt(2.*ka_out) sqrt(2.*ka_out) sqrt(2.*kb_out) sqrt(2.*kb_out)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
+Min = diag([sqrt(2.*ka_in) sqrt(2.*ka_in) sqrt(2.*kb_in) sqrt(2.*kb_in)]);   
+N = diag([a_ss conj(a_ss) b_ss conj(b_ss)]);  %%%% New N matrix to make Chi_Delta 
+
+    THETA_DELTA = LambdaMat*Min*inv(1i.*Omega.*eye(4)-Mc)*N*inv(LambdaMat);
     
