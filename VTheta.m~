@@ -11,6 +11,8 @@ function [Vrefl1,Vrefl2] = VTheta(varargin) %VReflTheta(THETA_1,X_1,...Theta_n,X
 % angle Phi (defult zero) that that allows selection of any abitrary pair
 % of orthgonal quadratures to measuere in.
 %
+% Need to take the X out of the Theta_Delta and Theta_epsilon functions
+%
 % For reference and further reading on the topic check out Kirk McKenzie's
 % thesis (2008, PhD dissertation, The Australian National University,
 % Canberra, Australia).  Also similar but slightly different ac see Shelia
@@ -78,7 +80,7 @@ end
 %accross for total noise.
 Vout_Terms = zeros(4,floor(nargin/2)); % Generate and pad with zeros for loop effiecency
 for ii = 1:floor(nargin/2) %Loop stepping through each pair of THETA and X terms
-    Vout_Terms(:,ii) = abs((varargin{ii*2-1})*quadRotation(Phi)).^2*varargin{ii*2}; %Compute matrix with variance entries for each noise source
+    Vout_Terms(:,ii) = abs((varargin{ii*2-1})*quadRotation(Phi)*varargin{ii*2}).^2; %Compute matrix with variance entries for each noise source
 end
 
 Vrefl1 = sum(Vout_Terms(1,:));%Select first quadrature of total output noise for the fundamental and sum accross all the noises computed above.

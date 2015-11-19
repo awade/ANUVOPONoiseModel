@@ -75,28 +75,25 @@ alpha_KTP = 6.7e-6; % [m/(m.K)] First order expation rate of KTP
 %%%%%%%%%%%%%%%%%%%%%%%
 
 % Speificies of input power etc
-Delta_a = [ka_total*0.01 0]; % On resonance with no fluctuations in harmonic and fundamental
-Delta_b = [0 0];
+Delta_a0 = [0 0]; % On resonance with no fluctuations in harmonic and fundamental
+Delta_b0 = [0 0];
 
 epsilon = [epsilon_0 0];
 
 Ain = 0;
 Bin = sqrt(105e-3/(h*c/lambdaHarm)); %[W] Incident pump amplitude put in units of sqrt(photon/s)
 
-%% Example scanning detuning
-% Omega = logspace(0,10,1000);
-% 
-% for i = 1:length(Omega)
-% [THETA_in] = THETA_in(Omega(i),Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a0,Delta_b0);
-% end
+%% Example scanning measuring quadrature, and comparing detuned and undetuned
 
 Omega = 0;
-phi = linspace(0,4*pi,10000);;
+phi = linspace(0,pi,10000);;
 Vin = [1;1;1;1]; % Assume input port fields are vacuum
 Vout = [1;1;1;1]; % Assume out port fields are vacuum
 
+THETA_in = THETA_in(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a0,Delta_b0,phi(jj))
+THETA_out = THETA_out(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a0,Delta_b0,phi(jj))
+THETA_l = THETA_loss(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_in,kb_out,kb_l,Delta_a0,Delta_b0,phi(jj))
 %Setting offset for Delta_a_ss [ka_total*0.01 0] and then again for zero offset to compair; 
-Delta_a_ss = [ka_total*0.01 0];
 
 for jj = 1:length(phi)
 for ii = 1:length(Delta_a_ss)
