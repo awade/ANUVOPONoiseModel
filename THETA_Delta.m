@@ -33,8 +33,10 @@ function [THETA_DELTA] = THETA_Delta(Omega,Ain,Bin,epsilon,ka_in,ka_out,ka_l,kb_
 % Mods: 18 Nov 2015
 %       19 Nov, added MDelta matrix and Lambda-1 to make Delta and epsilon
 %       consistent with other Theta/X matrices/vectors
+%       25 Nov, 2015 Small formating and commenting out line that is unused
+%       for efficiency
 
-% Check number of inputs and throw error if wrong
+
 
 ka_total = ka_in + ka_out + ka_l; %The total decay rate of the whole cavity
 kb_total = kb_in + kb_out + kb_l; %The total decay rate of the whole cavity
@@ -53,7 +55,7 @@ a_ss = sqrt(2.*ka_in).*(ka_total-1i.*Deltaa_ss+epsilon_ss.*b_ss)./(ka_total.^2+D
 
 LambdaMat = [1 1 0 0;1i -1i 0 0;0 0 1 1; 0 0 1i -1i]; %Defining transfer matrix that converts the creation anihilation form of 4x1 Fourier domain matrixes to 4x1 quadtrature terms
 
- Chi_Delta = [-1i.*a_ss.*Deltaa_delta;1i.*a_ss.*Deltaa_delta;-1i.*b_ss.*Deltab_delta;-1i.*b_ss.*Deltab_delta]; %Flucating part of the cavity detuning, due to cavity length noise or other temperature induced detuning etc
+% Chi_Delta = [-1i.*a_ss.*Deltaa_delta;1i.*a_ss.*Deltaa_delta;-1i.*b_ss.*Deltab_delta;-1i.*b_ss.*Deltab_delta]; %Flucating part of the cavity detuning, due to cavity length noise or other temperature induced detuning etc
 
 % Intracavity field round trip transfer matrix
 Mc = [-ka_total-1i.*Deltaa_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
@@ -62,9 +64,9 @@ Mc = [-ka_total-1i.*Deltaa_ss,epsilon_ss.*b_ss,epsilon_ss.*conj(a_ss),0;...
       0,-epsilon_ss.*conj(a_ss),0,-kb_total+1i.*Deltab_ss]; % Steady state transfer components of dual cavity equation matrix
   
 % The individual mirror coupling rate matrixes
-Mout = diag([sqrt(2.*ka_out) sqrt(2.*ka_out) sqrt(2.*kb_out) sqrt(2.*kb_out)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
+% Mout = diag([sqrt(2.*ka_out) sqrt(2.*ka_out) sqrt(2.*kb_out) sqrt(2.*kb_out)]); %Generate diagonal matrix with coupling rates of port of OPO cavity for both wavelengths
 Min = diag([sqrt(2.*ka_in) sqrt(2.*ka_in) sqrt(2.*kb_in) sqrt(2.*kb_in)]);   
 MDelta = diag([-1i*a_ss 1i*conj(a_ss) -1i*b_ss 1i*conj(b_ss)]);  %%%% New N matrix to make Chi_delta more consistent
 
-    THETA_DELTA = LambdaMat*Min*inv(1i.*Omega.*eye(4)-Mc)*MDelta*inv(LambdaMat); %%% Now multiplying by Lambda^-1 to turn Chi into X
+THETA_DELTA = LambdaMat*Min*inv(1i.*Omega.*eye(4)-Mc)*MDelta*inv(LambdaMat); %%% Now multiplying by Lambda^-1 to turn Chi into X
     
