@@ -80,7 +80,7 @@ end
 %accross for total noise.
 Vout_Terms = zeros(4,floor(nargin/2)); % Generate and pad with zeros for loop effiecency
 for ii = 1:floor(nargin/2) %Loop stepping through each pair of THETA and X terms
-    Vout_Terms(:,ii) = abs(quadRotation(Phi)*varargin{ii*2-1})*abs(varargin{ii*2}).^2; %Compute matrix with variance entries for each noise source
+    Vout_Terms(:,ii) = abs(quadRotation(Phi)*varargin{ii*2-1}).^2*abs(varargin{ii*2}).^2; %Compute matrix with variance entries for each noise source
 end
 
 Vrefl1 = sum(Vout_Terms(1,:));%Select first quadrature of total output noise for the fundamental and sum accross all the noises computed above.
